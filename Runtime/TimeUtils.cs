@@ -14,11 +14,11 @@ namespace JackSParrot.Utils
             }
         }
 
-        public static uint Timestamp
+        public static ulong Timestamp
         {
             get
             {
-                return (uint)(Now.Subtract(_epoch).TotalMilliseconds);
+                return (ulong)(Now.Subtract(_epoch).TotalMilliseconds);
             }
         }
 
