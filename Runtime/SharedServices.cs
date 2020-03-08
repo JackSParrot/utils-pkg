@@ -16,6 +16,12 @@ namespace JackSParrot.Utils
                 return _instance;
             }
         }
+
+        public static void UnregisterAll()
+        {
+            _instance = new SharedServices();
+        }
+        
         public static bool RegisterService<T>() where T : class, new()
         {
             return RegisterService(new T());
