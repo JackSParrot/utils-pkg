@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace JackSParrot.Utils
 {
@@ -26,6 +26,16 @@ namespace JackSParrot.Utils
             if (GetService<T>() == null)
             {
                 Instance._services.Add(typeof(T), service);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool UnRegisterService<T>() where T : class
+        {
+            if (GetService<T>() != null)
+            {
+                Instance._services.Remove(typeof(T));
                 return true;
             }
             return false;
