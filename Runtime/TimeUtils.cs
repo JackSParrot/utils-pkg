@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace JackSParrot.Utils
 {
@@ -19,6 +19,22 @@ namespace JackSParrot.Utils
             get
             {
                 return (ulong)(Now.Subtract(_epoch).TotalMilliseconds);
+            }
+        }
+
+        public static long TimestampSeconds
+        {
+            get
+            {
+                return (long)(Now.Subtract(_epoch).TotalSeconds);
+            }
+        }
+
+        public static long DaysFromEpoch
+        {
+            get
+            {
+                return (long)(Now.Subtract(_epoch).TotalDays);
             }
         }
 
