@@ -154,6 +154,7 @@ namespace JackSParrot.Utils
             {
                 yield return null;
             }
+            _observerHandlers.Remove(sceneName);
             yield return null;
             observer.FinishedUnloading();
         }
