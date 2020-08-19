@@ -2,54 +2,49 @@ using System.Collections.Generic;
 
 namespace JackSParrot.Utils
 {
-    public class SharedServices
+    public static class SharedServices
     {
-        static SharedServices _instance;
-        static SharedServices Instance
-        {
-            get
-            {
-                if(_instance == null)
-                {
-                    _instance = new SharedServices();
-                }
-                return _instance;
-            }
-        }
+        static Dictionary<System.Type, object> _services = new Dictionary<System.Type, object>();
 
         public static void UnregisterAll()
         {
-            _instance = new SharedServices();
+            foreach(var kvp in _services)
+            {
+                (kvp.Value as System.IDisposable).Dispose();
+            }
+            _services.Clear();
         }
         
-        public static bool RegisterService<T>() where T : class, new()
+        public static bool RegisterService<T>() where T : class, System.IDisposable, new()
         {
             return RegisterService(new T());
         }
 
-        public static bool RegisterService<T>(T service) where T : class
+        public static bool RegisterService<T>(T service) where T : class, System.IDisposable
         {
             if (GetService<T>() == null)
             {
-                Instance._services.Add(typeof(T), service);
+                _services.Add(typeof(T), service);
                 return true;
             }
             return false;
         }
 
-        public static bool UnRegisterService<T>() where T : class
+        public static bool UnRegisterService<T>() where T : class, System.IDisposable
         {
-            if (GetService<T>() != null)
+            var service = GetService<T>();
+            if (service != null)
             {
-                Instance._services.Remove(typeof(T));
+                service.Dispose();
+                _services.Remove(typeof(T));
                 return true;
             }
             return false;
         }
 
-        public static T GetService<T>() where T : class
+        public static T GetService<T>() where T : class, System.IDisposable
         {
-            foreach(var kvp in Instance._services)
+            foreach(var kvp in _services)
             {
                 var val = kvp.Value as T;
                 if(val != null)
@@ -58,12 +53,6 @@ namespace JackSParrot.Utils
                 }
             }
             return null;
-        }
-
-        Dictionary<System.Type, object> _services = new Dictionary<System.Type, object>();
-        private SharedServices()
-        {
-
         }
     }
 }

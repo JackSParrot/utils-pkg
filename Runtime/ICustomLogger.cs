@@ -1,4 +1,6 @@
-﻿namespace JackSParrot.Utils
+﻿using System;
+
+namespace JackSParrot.Utils
 {
     public enum LogLevel
     {
@@ -7,7 +9,7 @@
         Error
     };
 
-    public interface ICustomLogger
+    public interface ICustomLogger : IDisposable
     {
         void SetLogLevel(LogLevel level);
         void LogDebug(string message);

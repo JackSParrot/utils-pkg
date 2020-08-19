@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JackSParrot.Utils
 {
-    public class EventDispatcher
+    public class EventDispatcher : IDisposable
     {
         public delegate void Listener<T>(T e) where T : class;
 
@@ -65,6 +65,11 @@ namespace JackSParrot.Utils
                     callback(e);
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            Clear();
         }
     }
 }

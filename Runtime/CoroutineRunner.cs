@@ -5,7 +5,14 @@ using UnityEngine;
 
 namespace JackSParrot.Utils
 {
-    public class CoroutineRunner : IDisposable
+    public interface ICoroutineRunner : IDisposable
+    {
+        Coroutine StartCoroutine(object sender, IEnumerator coroutine);
+        void StopCoroutine(object sender, Coroutine coroutine);
+        void StopAllCoroutines(object sender);
+    }
+
+    public class CoroutineRunner : ICoroutineRunner
     {
         public class Runner : MonoBehaviour {}
 

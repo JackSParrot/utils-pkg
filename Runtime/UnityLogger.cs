@@ -36,5 +36,10 @@ namespace JackSParrot.Utils
                 Debug.LogWarning(message);
             }
         }
+
+        public void Dispose()
+        {
+
+        }
     }
 }
