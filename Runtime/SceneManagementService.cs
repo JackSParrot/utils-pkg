@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
@@ -7,6 +7,11 @@ namespace JackSParrot.Utils
 {
     public class SceneManagementService : IDisposable
     {
+        public class SceneEvent { public string SceneName; }
+        public class SceneActivatedEvent : SceneEvent { }
+        public class SceneLoadedEvent : SceneEvent { }
+        public class SceneUnloadedEvent : SceneEvent { }
+
         readonly Dictionary<string, Scene> _scenes = new Dictionary<string, Scene>();
         Scene _persistantScene;
         Scene _activeScene => SceneManager.GetActiveScene();
@@ -55,7 +60,7 @@ namespace JackSParrot.Utils
             yield return null;
             _scenes.Remove(sceneName);
             callback?.Invoke();
-            yield return null;
+            SharedServices.GetService<EventDispatcher>().Raise(new SceneUnloadedEvent { SceneName = sceneName });
         }
 
         IEnumerator LoadSceneCoroutine(string sceneName, bool additive, bool setActive, Action callback)
@@ -68,6 +73,7 @@ namespace JackSParrot.Utils
             }
             yield return null;
             _scenes.Add(sceneName, SceneManager.GetSceneByName(sceneName));
+            SharedServices.GetService<EventDispatcher>().Raise(new SceneLoadedEvent { SceneName = sceneName });
             if (setActive)
             {
                 while(!SceneManager.SetActiveScene(_scenes[sceneName]))
@@ -81,6 +87,7 @@ namespace JackSParrot.Utils
             }
             yield return null;
             callback?.Invoke();
+            SharedServices.GetService<EventDispatcher>().Raise(new SceneActivatedEvent { SceneName = sceneName });
         }
 
         public void Dispose()
