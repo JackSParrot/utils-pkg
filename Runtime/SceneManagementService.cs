@@ -62,7 +62,7 @@ namespace JackSParrot.Utils
         {
             SceneManager.LoadSceneAsync(sceneName, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
             yield return null;
-            while (!SceneManager.GetSceneByName(sceneName).IsValid())
+            while (!SceneManager.GetSceneByName(sceneName).isLoaded)
             {
                 yield return null;
             }
