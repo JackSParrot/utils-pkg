@@ -25,6 +25,14 @@ namespace JackSParrot.Utils
             _persistantScene = _scenes[sceneName];
         }
 
+        public void TransitionToScene(string toSceneName, Action callback)
+        {
+            UnloadScene(_activeScene.name, () =>
+            {
+                LoadScene(toSceneName, true, true, callback);
+            });
+        }
+
         public void LoadScene(string sceneName, bool additive = false, bool setActive = true, Action callback = null)
         {
             if(_scenes.ContainsKey(sceneName))
