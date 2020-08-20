@@ -25,7 +25,7 @@ namespace JackSParrot.Utils
             _persistantScene = _scenes[sceneName];
         }
 
-        public void TransitionToScene(string toSceneName, Action callback)
+        public void TransitionToScene(string toSceneName, Action callback = null)
         {
             UnloadScene(_activeScene.name, () =>
             {
