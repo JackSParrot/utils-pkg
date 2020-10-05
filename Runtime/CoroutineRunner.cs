@@ -36,6 +36,7 @@ namespace JackSParrot.Utils
                 _running.Add(sender, new List<Coroutine>());
             }
             _running[sender].Add(ret);
+            _runner.StartCoroutine(RunCoroutine(sender, ret));
             return ret;
         }
 
@@ -67,7 +68,14 @@ namespace JackSParrot.Utils
 
         public void Dispose()
         {
+            _running.Clear();
             UnityEngine.Object.Destroy(_runner.gameObject);
+        }
+
+        IEnumerator RunCoroutine(object sender, Coroutine coroutine)
+        {
+            yield return coroutine;
+            _running[sender].Remove(coroutine);
         }
     }
 }
