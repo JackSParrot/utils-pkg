@@ -84,10 +84,21 @@ namespace JackSParrot.Utils
             SharedServices.GetService<EventDispatcher>().Raise(new SceneLoadedEvent { SceneName = sceneName });
             if (setActive)
             {
-                while(!SceneManager.SetActiveScene(_scenes[sceneName]))
-                {
-                    yield return null;
-                }
+                bool hasSetActiveScene = false;
+				do
+				{
+					try
+					{
+						hasSetActiveScene = SceneManager.SetActiveScene(_scenes[sceneName]);
+					}
+					catch (Exception e)
+					{
+						UnityEngine.Debug.LogException(e);
+						break;
+					}
+					yield return null;
+				}
+				while (!hasSetActiveScene);
                 while(_scenes[sceneName] != SceneManager.GetActiveScene())
                 {
                     yield return null;
