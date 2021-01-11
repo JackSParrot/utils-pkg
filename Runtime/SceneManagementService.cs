@@ -11,23 +11,42 @@ namespace JackSParrot.Utils
 		public class SceneActivatedEvent : SceneEvent { }
 		public class SceneLoadedEvent : SceneEvent { }
 		public class SceneUnloadedEvent : SceneEvent { }
+		public Scene ActiveScene => SceneManager.GetActiveScene();
 
-		readonly Dictionary<string, Scene> _scenes = new Dictionary<string, Scene>();
-		Scene _persistantScene;
-		Scene _activeScene => SceneManager.GetActiveScene();
+		private readonly Dictionary<string, Scene> _scenes = new Dictionary<string, Scene>();
+		private Scene _persistentScene;
+
+		public void Persist(GameObject objectToPersist)
+        {
+			if(!_persistentScene.IsValid())
+			{
+				Debug.LogError($"Before persisting an object you need to set the persistent scene");
+				return;
+			}
+			SceneManager.MoveGameObjectToScene(objectToPersist, _persistentScene);
+		}
 
 		public void SetPersistentScene(string sceneName)
 		{
 			if (!_scenes.ContainsKey(sceneName))
 			{
-				throw new Exception($"Scene {sceneName} can not be set as persistant, it has not been loaded");
+				var activeScene = ActiveScene;
+				if(activeScene.IsValid() && sceneName.Equals(activeScene.name))
+                {
+					_scenes.Add(sceneName, activeScene);
+                }
+				else
+				{
+					Debug.LogError($"Scene {sceneName} can not be set as persistent, it has not been loaded");
+					return;
+				}
 			}
-			_persistantScene = _scenes[sceneName];
+			_persistentScene = _scenes[sceneName];
 		}
 
 		public void TransitionToScene(string toSceneName, Action callback = null)
 		{
-			UnloadScene(_activeScene.name, () =>
+			UnloadScene(ActiveScene.name, () =>
 			{
 				LoadScene(toSceneName, true, true, callback);
 			});
@@ -37,6 +56,7 @@ namespace JackSParrot.Utils
 		{
 			if (_scenes.ContainsKey(sceneName))
 			{
+				Debug.LogError($"Tried to load an already loaded scene {sceneName}");
 				callback?.Invoke();
 				return;
 			}
@@ -49,18 +69,29 @@ namespace JackSParrot.Utils
 
 		public void UnloadScene(string sceneName, Action callback = null)
 		{
-			if (!_scenes.ContainsKey(sceneName))
+			if (!_persistentScene.IsValid() && _persistentScene.name.Equals(sceneName, StringComparison.InvariantCultureIgnoreCase))
 			{
+				Debug.LogError($"Tried to unload the persistent scene {sceneName}. Set a different active scene before unloading it");
 				callback?.Invoke();
 				return;
+			}
+			if (!_scenes.ContainsKey(sceneName))
+			{
+				Debug.LogError($"Tried to unload a scene not loaded {sceneName}");
+				callback?.Invoke();
+				return;
+			}
+			if (SharedServices.GetService<ICoroutineRunner>() == null)
+			{
+				SharedServices.RegisterService<ICoroutineRunner>(new CoroutineRunner());
 			}
 			SharedServices.GetService<ICoroutineRunner>().StartCoroutine(this, UnloadSceneCoroutine(sceneName, callback));
 		}
 
-		IEnumerator UnloadSceneCoroutine(string sceneName, Action callback)
+		private IEnumerator UnloadSceneCoroutine(string sceneName, Action callback)
 		{
 			var handler = SceneManager.UnloadSceneAsync(sceneName);
-			while(!handler.isDone)
+			while (!handler.isDone)
 			{
 				yield return null;
 			}
@@ -73,7 +104,7 @@ namespace JackSParrot.Utils
 			SharedServices.GetService<EventDispatcher>().Raise(new SceneUnloadedEvent { SceneName = sceneName });
 		}
 
-		IEnumerator LoadSceneCoroutine(string sceneName, bool additive, bool setActive, Action callback)
+		private IEnumerator LoadSceneCoroutine(string sceneName, bool additive, bool setActive, Action callback)
 		{
 			var handler = SceneManager.LoadSceneAsync(sceneName, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
 			while (!handler.isDone)
