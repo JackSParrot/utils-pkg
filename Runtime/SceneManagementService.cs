@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine;
 
 namespace JackSParrot.Utils
 {
@@ -16,11 +17,11 @@ namespace JackSParrot.Utils
 		private readonly Dictionary<string, Scene> _scenes = new Dictionary<string, Scene>();
 		private Scene _persistentScene;
 
-		public void Persist(UnityEngine.GameObject objectToPersist)
+		public void Persist(GameObject objectToPersist)
         {
 			if(!_persistentScene.IsValid())
 			{
-				UnityEngine.Debug.LogError($"Before persisting an object you need to set the persistent scene");
+				Debug.LogError($"Before persisting an object you need to set the persistent scene");
 				return;
 			}
 			SceneManager.MoveGameObjectToScene(objectToPersist, _persistentScene);
