@@ -16,11 +16,11 @@ namespace JackSParrot.Utils
 		private readonly Dictionary<string, Scene> _scenes = new Dictionary<string, Scene>();
 		private Scene _persistentScene;
 
-		public void Persist(GameObject objectToPersist)
+		public void Persist(UnityEngine.GameObject objectToPersist)
         {
 			if(!_persistentScene.IsValid())
 			{
-				Debug.LogError($"Before persisting an object you need to set the persistent scene");
+				UnityEngine.Debug.LogError($"Before persisting an object you need to set the persistent scene");
 				return;
 			}
 			SceneManager.MoveGameObjectToScene(objectToPersist, _persistentScene);
