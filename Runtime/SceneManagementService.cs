@@ -70,7 +70,7 @@ namespace JackSParrot.Utils
 
 		public void UnloadScene(string sceneName, Action callback = null)
 		{
-			if (!_persistentScene.IsValid() && _persistentScene.name.Equals(sceneName, StringComparison.InvariantCultureIgnoreCase))
+			if (_persistentScene.IsValid() && _persistentScene.name.Equals(sceneName, StringComparison.InvariantCultureIgnoreCase))
 			{
 				Debug.LogError($"Tried to unload the persistent scene {sceneName}. Set a different active scene before unloading it");
 				callback?.Invoke();
