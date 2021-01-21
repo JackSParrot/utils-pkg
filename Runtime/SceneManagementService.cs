@@ -107,7 +107,10 @@ namespace JackSParrot.Utils
 
 		private IEnumerator LoadSceneCoroutine(string sceneName, bool additive, bool setActive, Action callback)
 		{
+		        Scene previousScene = ActiveScene;
+			var previousSceneObjects = previousScene.GetRootGameObjects();
 			var handler = SceneManager.LoadSceneAsync(sceneName, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
+			handler.allowSceneActivation = setActive;
 			while (!handler.isDone)
 			{
 				yield return null;
@@ -138,6 +141,20 @@ namespace JackSParrot.Utils
 				while (_scenes[sceneName] != SceneManager.GetActiveScene())
 				{
 					yield return null;
+				}
+			}
+			Scene active = ActiveScene;
+			var previousSceneObjectsUpdated = previousScene.GetRootGameObjects();
+			foreach(var go in previousSceneObjectsUpdated)
+			{
+				bool found = false;
+				for(int i = 0; i < previousSceneObjects.Length && !found; ++i)
+				{
+					found = previousSceneObjects[i] == go;
+				}
+				if(!found)
+				{
+					SceneManager.MoveGameObjectToScene(go, active);
 				}
 			}
 			callback?.Invoke();
