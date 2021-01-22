@@ -16,9 +16,43 @@ namespace JackSParrot.Utils
 
 		private readonly Dictionary<string, Scene> _scenes = new Dictionary<string, Scene>();
 		private Scene _persistentScene;
+		private EventDispatcher _eventDispatcherRef = null;
+		private EventDispatcher _eventDispatcher
+		{
+			get
+			{
+				if (_eventDispatcherRef == null)
+				{
+					_eventDispatcherRef = SharedServices.GetService<EventDispatcher>();
+					if (_eventDispatcherRef == null)
+					{
+						_eventDispatcherRef = new EventDispatcher();
+						SharedServices.RegisterService(_eventDispatcherRef);
+					}
+				}
+				return _eventDispatcherRef;
+			}
+		}
+		private ICoroutineRunner _coroutineRunnerRef = null;
+		private ICoroutineRunner _coroutineRunner
+		{
+			get
+			{
+				if (_coroutineRunnerRef == null)
+				{
+					_coroutineRunnerRef = SharedServices.GetService<ICoroutineRunner>();
+					if (_coroutineRunnerRef == null)
+					{
+						_coroutineRunnerRef = new CoroutineRunner();
+						SharedServices.RegisterService(_coroutineRunnerRef);
+					}
+				}
+				return _coroutineRunnerRef;
+			}
+		}
 
 		public void Persist(GameObject objectToPersist)
-        {
+		{
 			if(!_persistentScene.IsValid())
 			{
 				Debug.LogError($"Before persisting an object you need to set the persistent scene");
@@ -33,9 +67,9 @@ namespace JackSParrot.Utils
 			{
 				var activeScene = ActiveScene;
 				if(activeScene.IsValid() && sceneName.Equals(activeScene.name))
-                {
+				{
 					_scenes.Add(sceneName, activeScene);
-                }
+				}
 				else
 				{
 					Debug.LogError($"Scene {sceneName} can not be set as persistent, it has not been loaded");
@@ -61,11 +95,7 @@ namespace JackSParrot.Utils
 				callback?.Invoke();
 				return;
 			}
-			if (SharedServices.GetService<ICoroutineRunner>() == null)
-			{
-				SharedServices.RegisterService<ICoroutineRunner>(new CoroutineRunner());
-			}
-			SharedServices.GetService<ICoroutineRunner>().StartCoroutine(this, LoadSceneCoroutine(sceneName, additive, setActive, callback));
+			_coroutineRunner.StartCoroutine(this, LoadSceneCoroutine(sceneName, additive, setActive, callback));
 		}
 
 		public void UnloadScene(string sceneName, Action callback = null)
@@ -82,11 +112,7 @@ namespace JackSParrot.Utils
 				callback?.Invoke();
 				return;
 			}
-			if (SharedServices.GetService<ICoroutineRunner>() == null)
-			{
-				SharedServices.RegisterService<ICoroutineRunner>(new CoroutineRunner());
-			}
-			SharedServices.GetService<ICoroutineRunner>().StartCoroutine(this, UnloadSceneCoroutine(sceneName, callback));
+			_coroutineRunner.StartCoroutine(this, UnloadSceneCoroutine(sceneName, callback));
 		}
 
 		private IEnumerator UnloadSceneCoroutine(string sceneName, Action callback)
@@ -102,12 +128,12 @@ namespace JackSParrot.Utils
 			}
 			_scenes.Remove(sceneName);
 			callback?.Invoke();
-			SharedServices.GetService<EventDispatcher>().Raise(new SceneUnloadedEvent { SceneName = sceneName });
+			_eventDispatcher.Raise(new SceneUnloadedEvent { SceneName = sceneName });
 		}
 
 		private IEnumerator LoadSceneCoroutine(string sceneName, bool additive, bool setActive, Action callback)
 		{
-		        Scene previousScene = ActiveScene;
+		    Scene previousScene = ActiveScene;
 			var previousSceneObjects = previousScene.GetRootGameObjects();
 			var handler = SceneManager.LoadSceneAsync(sceneName, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
 			handler.allowSceneActivation = setActive;
@@ -120,7 +146,7 @@ namespace JackSParrot.Utils
 				yield return null;
 			}
 			_scenes.Add(sceneName, SceneManager.GetSceneByName(sceneName));
-			SharedServices.GetService<EventDispatcher>().Raise(new SceneLoadedEvent { SceneName = sceneName });
+			_eventDispatcher.Raise(new SceneLoadedEvent { SceneName = sceneName });
 			if (setActive)
 			{
 				bool hasSetActiveScene;
@@ -158,7 +184,7 @@ namespace JackSParrot.Utils
 				}
 			}
 			callback?.Invoke();
-			SharedServices.GetService<EventDispatcher>().Raise(new SceneActivatedEvent { SceneName = sceneName });
+			_eventDispatcher.Raise(new SceneActivatedEvent { SceneName = sceneName });
 		}
 
 		public void Dispose()
@@ -167,3 +193,4 @@ namespace JackSParrot.Utils
 		}
 	}
 }
+
