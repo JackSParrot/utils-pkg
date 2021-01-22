@@ -1,59 +1,68 @@
+using System;
 using System.Collections.Generic;
 
 namespace JackSParrot.Utils
 {
     public static class SharedServices
     {
-        static Dictionary<System.Type, object> _services = new Dictionary<System.Type, object>();
+        private static Dictionary<Type, IDisposable> _services = new Dictionary<Type, IDisposable>();
+
+        public static void RegisterService<T>(T service, bool overwrite = false) where T : IDisposable
+        {
+            Type type = typeof(T);
+            if (_services.ContainsKey(type))
+            {
+                if (overwrite)
+                {
+                    UnregisterService<T>();
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError("Tried to add an already existing service to the service locator: " + type.Name);
+                    return;
+                }
+            }
+            _services.Add(type, service);
+        }
+
+        public static void RegisterService<T>() where T : IDisposable, new()
+        {
+            RegisterService(new T());
+        }
+
+        public static bool HasService<T>() where T : IDisposable
+        {
+            return _services.ContainsKey(typeof(T));
+        }
+
+        public static T GetService<T>() where T : IDisposable
+        {
+            IDisposable service;
+            if (!_services.TryGetValue(typeof(T), out service))
+            {
+                UnityEngine.Debug.LogError("Tried to get a non registered service from the service locator: " + typeof(T).Name);
+                return default;
+            }
+            return (T)service;
+        }
+
+        public static void UnregisterService<T>()
+        {
+            Type type = typeof(T);
+            if (_services.ContainsKey(type))
+            {
+                _services[type].Dispose();
+                _services.Remove(type);
+            }
+        }
 
         public static void UnregisterAll()
         {
-            foreach(var kvp in _services)
+            foreach (KeyValuePair<Type, IDisposable> service in _services)
             {
-                (kvp.Value as System.IDisposable).Dispose();
+                service.Value.Dispose();
             }
             _services.Clear();
         }
-        
-        public static bool RegisterService<T>() where T : class, System.IDisposable, new()
-        {
-            return RegisterService(new T());
-        }
-
-        public static bool RegisterService<T>(T service) where T : class, System.IDisposable
-        {
-            if (GetService<T>() == null)
-            {
-                _services.Add(typeof(T), service);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool UnRegisterService<T>() where T : class, System.IDisposable
-        {
-            var service = GetService<T>();
-            if (service != null)
-            {
-                service.Dispose();
-                _services.Remove(typeof(T));
-                return true;
-            }
-            return false;
-        }
-
-        public static T GetService<T>() where T : class, System.IDisposable
-        {
-            foreach(var kvp in _services)
-            {
-                var val = kvp.Value as T;
-                if(val != null)
-                {
-                    return val;
-                }
-            }
-            return null;
-        }
     }
 }
-
