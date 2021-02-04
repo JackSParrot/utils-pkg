@@ -22,7 +22,7 @@ namespace JackSParrot.Utils
         public UnityTimeService()
         {
             _lastSeconds = UnityEngine.Time.time;
-            _lastDate = DateTime.UtcNow;
+            _lastDate = DateTime.Now;
         }
 
         public DateTime Now
