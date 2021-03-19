@@ -1,23 +1,21 @@
 using System;
+using UnityEngine;
 using System.Collections.Generic;
 
 namespace JackSParrot.Utils
 {
     public class EventDispatcher : IDisposable
     {
-        private class Listener
+         private class Listener
         {
             public Type EventType;
             public Delegate EventDelegate;
         }
 
-        readonly Dictionary<Type, List<Delegate>> _listeners = new Dictionary<Type, List<Delegate>>();
-        readonly List<Listener> _listenersToAdd = new List<Listener>();
-        readonly List<Listener> _listenersToRemove = new List<Listener>();
+        readonly private Dictionary<Type, List<Delegate>> _listeners = new Dictionary<Type, List<Delegate>>();
+        readonly private List<Listener> _listenersToAdd = new List<Listener>();
+        readonly private List<Listener> _listenersToRemove = new List<Listener>();
         private bool _processing = false;
-#if !ENABLE_IL2CPP
-        readonly List<dynamic> _eventsToRaise = new List<dynamic>();
-#endif
 
         public void AddListener<T>(Action<T> listener) where T : class
         {
@@ -52,33 +50,16 @@ namespace JackSParrot.Utils
 
         public void Raise<T>(T e) where T : class
         {
-#if ENABLE_IL2CPP
-                InternalRaise(e);
-#else
             if (_processing)
             {
-                _eventsToRaise.Add(e);
+                Debug.LogWarning("Triggered an event while processing a previous event");
             }
-            else
-            {
-                InternalRaise(e);
-                while (_eventsToRaise.Count > 0)
-                {
-                    InternalRaise(_eventsToRaise[0]);
-                    _eventsToRaise.RemoveAt(0);
-                }
-            }
-#endif
-        }
 
-        void InternalRaise<T>(T e) where T : class
-        {
-            UnityEngine.Debug.Assert(e != null, "Raised a null event");
-
+            Debug.Assert(e != null, "Raised a null event");
             Type type = e.GetType();
             if (!_listeners.TryGetValue(type, out List<Delegate> listeners))
             {
-                UnityEngine.Debug.Log("Raised event with no listeners");
+                Debug.Log("Raised event with no listeners");
                 return;
             }
 
@@ -116,21 +97,18 @@ namespace JackSParrot.Utils
             _listeners.Clear();
             _listenersToAdd.Clear();
             _listenersToRemove.Clear();
-#if !ENABLE_IL2CPP
-            _eventsToRaise.Clear();
-#endif
         }
 
         #region Internals
         private void AddListenerInternal(Listener listener)
         {
-            UnityEngine.Debug.Assert(listener != null, "Added a null listener.");
+            Debug.Assert(listener != null, "Added a null listener.");
             if (!_listeners.TryGetValue(listener.EventType, out List<Delegate> delegateList))
             {
                 delegateList = new List<Delegate>();
                 _listeners[listener.EventType] = delegateList;
             }
-            UnityEngine.Debug.Assert(delegateList.Find(e => e == listener.EventDelegate) == null, "Added duplicated event listener to the event dispatcher.");
+            Debug.Assert(delegateList.Find(e => e == listener.EventDelegate) == null, "Added duplicated event listener to the event dispatcher.");
             delegateList.Add(listener.EventDelegate);
         }
 
