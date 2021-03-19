@@ -14,13 +14,15 @@ namespace JackSParrot.Utils
         readonly Dictionary<Type, List<Delegate>> _listeners = new Dictionary<Type, List<Delegate>>();
         readonly List<Listener> _listenersToAdd = new List<Listener>();
         readonly List<Listener> _listenersToRemove = new List<Listener>();
-        readonly List<dynamic> _eventsToRaise = new List<dynamic>();
         private bool _processing = false;
+#if !ENABLE_IL2CPP
+        readonly List<dynamic> _eventsToRaise = new List<dynamic>();
+#endif
 
         public void AddListener<T>(Action<T> listener) where T : class
         {
             var evListener = new Listener { EventType = typeof(T), EventDelegate = listener };
-            if(_processing)
+            if (_processing)
             {
                 _listenersToAdd.Add(evListener);
             }
@@ -50,19 +52,23 @@ namespace JackSParrot.Utils
 
         public void Raise<T>(T e) where T : class
         {
-            if(_processing)
+#if ENABLE_IL2CPP
+                InternalRaise(e);
+#else
+            if (_processing)
             {
                 _eventsToRaise.Add(e);
             }
             else
             {
                 InternalRaise(e);
-                while(_eventsToRaise.Count > 0)
+                while (_eventsToRaise.Count > 0)
                 {
                     InternalRaise(_eventsToRaise[0]);
                     _eventsToRaise.RemoveAt(0);
                 }
             }
+#endif
         }
 
         void InternalRaise<T>(T e) where T : class
@@ -78,7 +84,7 @@ namespace JackSParrot.Utils
 
             _processing = true;
             listeners.RemoveAll(e => e == null);
-            foreach(Delegate listener in listeners)
+            foreach (Delegate listener in listeners)
             {
                 if (listener is Action<T> castedDelegate)
                 {
@@ -110,6 +116,9 @@ namespace JackSParrot.Utils
             _listeners.Clear();
             _listenersToAdd.Clear();
             _listenersToRemove.Clear();
+#if !ENABLE_IL2CPP
+            _eventsToRaise.Clear();
+#endif
         }
 
         #region Internals
@@ -132,6 +141,6 @@ namespace JackSParrot.Utils
                 group.RemoveAll(e => e == listener.EventDelegate);
             }
         }
-        #endregion
+#endregion
     }
 }
