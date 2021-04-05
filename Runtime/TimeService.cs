@@ -10,7 +10,8 @@ namespace JackSParrot.Utils
         long DaysFromEpoch { get; }
         string FormatDateEurope(int timestampSeconds);
         string FormatDateEurope(DateTime dateTime);
-        string FormatTime(int timeSeconds);
+        string FormatTime(int timeSeconds, string daysToken = "d", string hoursToken = "h", string minutesToken = "m", string secondsToken = "s");
+        string FormatTimeShort(int timeSeconds, string separationToken = ":");
     }
 
     public class UnityTimeService : ITimeService
@@ -40,44 +41,45 @@ namespace JackSParrot.Utils
             }
         }
 
-        public ulong TimestampMillis
-        {
-            get
-            {
-                return (ulong)Now.Subtract(_epoch).TotalMilliseconds;
-            }
-        }
+        public ulong TimestampMillis => (ulong)Now.Subtract(_epoch).TotalMilliseconds;
 
-        public long TimestampSeconds
-        {
-            get
-            {
-                return (long)Now.Subtract(_epoch).TotalSeconds;
-            }
-        }
+        public long TimestampSeconds => (long)Now.Subtract(_epoch).TotalSeconds;
 
-        public long DaysFromEpoch
-        {
-            get
-            {
-                return (long)Now.Subtract(_epoch).TotalDays;
-            }
-        }
-
-        public string FormatTime(int timeSeconds)
+        public long DaysFromEpoch => (long)Now.Subtract(_epoch).TotalDays;
+        
+        
+        public string FormatTimeShort(int timeSeconds, string separationToken = ":")
         {
             int time = timeSeconds;
             int hours = time / 3600;
-            time -= timeSeconds - hours * 3600;
+            time -= hours * 3600;
             int minutes = time / 60;
             int seconds = time - minutes * 60;
-            var stringBuilder = new System.Text.StringBuilder();
             if (hours > 0)
             {
-                stringBuilder.Append(hours.ToString()).Append(":");
+                return $"{hours.ToString()}{separationToken}{minutes.ToString()}{separationToken}{seconds.ToString()}";
             }
-            stringBuilder.Append(minutes.ToString()).Append(":").Append(seconds);
-            return stringBuilder.ToString();
+            return $"{minutes.ToString()}{separationToken}{seconds.ToString()}";
+        }
+        
+        public string FormatTime(int timeSeconds, string daysToken = "d", string hoursToken = "h", string minutesToken = "m", string secondsToken = "s")
+        {
+            int time = timeSeconds;
+            int days = timeSeconds / (3600 * 24);
+            time -= days * (3600 * 24);
+            int hours = time / 3600;
+            time -= hours * 3600;
+            int minutes = time / 60;
+            int seconds = time - minutes * 60;
+            if (days > 0)
+            {
+                return $"{days.ToString()}{daysToken} {hours.ToString()}{hoursToken}";
+            }
+            if (hours > 0)
+            {
+                return $"{hours.ToString()}{hoursToken} {minutes.ToString()}{minutesToken}";
+            }
+            return $"{minutes.ToString()}{minutesToken} {seconds.ToString()}{secondsToken}";
         }
 
         public string FormatDateEurope(int timestampSeconds)
