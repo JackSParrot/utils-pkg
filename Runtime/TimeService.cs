@@ -4,6 +4,7 @@ namespace JackSParrot.Utils
 {
     public interface ITimeService : IDisposable
     {
+        void UpdateRealTime();
         DateTime Now { get; }
         ulong TimestampMillis { get; }
         long TimestampSeconds { get; }
@@ -21,6 +22,11 @@ namespace JackSParrot.Utils
         DateTime _lastDate;
 
         public UnityTimeService()
+        {
+            UpdateRealTime();
+        }
+
+        public void UpdateRealTime()
         {
             _lastSeconds = UnityEngine.Time.time;
             _lastDate = DateTime.Now;
