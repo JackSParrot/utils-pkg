@@ -50,16 +50,20 @@ namespace JackSParrot.Utils
 
         public void Raise<T>(T e) where T : class
         {
+#if DEBUG
             if (_processing)
             {
                 Debug.LogWarning("Triggered an event while processing a previous event");
             }
+#endif
 
             Debug.Assert(e != null, "Raised a null event");
             Type type = e.GetType();
             if (!_listeners.TryGetValue(type, out List<Delegate> listeners))
             {
+#if DEBUG
                 Debug.Log("Raised event with no listeners");
+#endif
                 return;
             }
 
