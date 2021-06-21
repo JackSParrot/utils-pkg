@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace JackSParrot.Utils
 {
@@ -24,6 +25,11 @@ namespace JackSParrot.Utils
         public UnityTimeService()
         {
             UpdateRealTime();
+			Application.focusChanged += focused =>
+			{
+				if (focused)
+					UpdateRealTime();
+			};
         }
 
         public void UpdateRealTime()
