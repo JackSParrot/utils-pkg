@@ -60,7 +60,14 @@ namespace JackSParrot.Utils
         {
             foreach (KeyValuePair<Type, IDisposable> service in _services)
             {
-                service.Value.Dispose();
+                try
+                {
+                    service.Value.Dispose();
+                }
+                catch(System.Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
             }
             _services.Clear();
         }
