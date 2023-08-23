@@ -3,38 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace JackSParrot.Utils
+namespace JackSParrot.Services
 {
-    public interface ICoroutineRunner : IDisposable
+    [CreateAssetMenu(fileName = "CoroutineRunner", menuName = "JackSParrot/Services/CoroutineRunner")]
+    public class CoroutineRunner : AService
     {
-        Coroutine StartCoroutine(object sender, IEnumerator coroutine);
-        void StopCoroutine(object sender, Coroutine coroutine);
-        void StopAllCoroutines(object sender);
-    }
-
-    public class CoroutineRunner : ICoroutineRunner
-    {
-        public class Runner : MonoBehaviour {}
+        public class Runner : MonoBehaviour
+        {
+        }
 
         Runner _runner = null;
+
         Dictionary<object, List<Coroutine>> _running = new Dictionary<object, List<Coroutine>>();
-        public CoroutineRunner()
-        {
-            _runner = new GameObject("CoroutineRunner").AddComponent<Runner>();
-            UnityEngine.Object.DontDestroyOnLoad(_runner.gameObject);
-        }
 
         public Coroutine StartCoroutine(object sender, IEnumerator coroutine)
         {
-            if(sender == null)
+            if (sender == null)
             {
                 return null;
             }
-            var ret = _runner.StartCoroutine(coroutine);
-            if(!_running.ContainsKey(sender))
+
+            Coroutine ret = _runner.StartCoroutine(coroutine);
+            if (!_running.ContainsKey(sender))
             {
                 _running.Add(sender, new List<Coroutine>());
             }
+
             _running[sender].Add(ret);
             _runner.StartCoroutine(RunCoroutine(sender, ret));
             return ret;
@@ -46,6 +40,7 @@ namespace JackSParrot.Utils
             {
                 return;
             }
+
             _running[sender].Remove(coroutine);
             _runner.StopCoroutine(coroutine);
         }
@@ -56,20 +51,36 @@ namespace JackSParrot.Utils
             {
                 return;
             }
-            foreach(var cor in _running[sender])
+
+            foreach (Coroutine cor in _running[sender])
             {
-                if(cor != null)
+                if (cor != null)
                 {
                     _runner.StopCoroutine(cor);
                 }
             }
+
             _running.Remove(sender);
         }
 
-        public void Dispose()
+        public override void Cleanup()
         {
             _running.Clear();
             UnityEngine.Object.Destroy(_runner.gameObject);
+            Status = EServiceStatus.NotInitialized;
+        }
+
+        public override List<Type> GetDependencies()
+        {
+            return null;
+        }
+
+        public override IEnumerator Initialize()
+        {
+            _runner = new GameObject("CoroutineRunner").AddComponent<Runner>();
+            UnityEngine.Object.DontDestroyOnLoad(_runner.gameObject);
+            Status = EServiceStatus.Initialized;
+            yield return null;
         }
 
         IEnumerator RunCoroutine(object sender, Coroutine coroutine)

@@ -1,4 +1,7 @@
-﻿namespace JackSParrot.Utils
+﻿using System;
+using System.Collections.Generic;
+
+namespace JackSParrot.Utils
 {
     public class DeterministicRandom
     {
