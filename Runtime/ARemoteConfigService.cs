@@ -1,6 +1,4 @@
-﻿using JackSParrot.Services;
-
-namespace JackSparrot.Services
+﻿namespace JackSParrot.Services
 {
 	public abstract class ARemoteConfigService : AService
 	{

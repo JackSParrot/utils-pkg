@@ -1,9 +1,6 @@
-﻿#if UNITY_ANDROID
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Game.Services;
-using JackSParrot.Utils;
 using UnityEngine;
 
 namespace JackSParrot.Services.AppReview
@@ -41,4 +38,3 @@ namespace JackSParrot.Services.AppReview
 		}
 	}
 }
-#endif

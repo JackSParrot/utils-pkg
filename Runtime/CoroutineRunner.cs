@@ -80,7 +80,7 @@ namespace JackSParrot.Services
             _runner = new GameObject("CoroutineRunner").AddComponent<Runner>();
             UnityEngine.Object.DontDestroyOnLoad(_runner.gameObject);
             Status = EServiceStatus.Initialized;
-            yield return null;
+            yield break;
         }
 
         IEnumerator RunCoroutine(object sender, Coroutine coroutine)

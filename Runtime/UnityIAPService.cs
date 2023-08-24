@@ -117,7 +117,7 @@ namespace JackSParrot.Services
 				IDs ids = new IDs();
 				foreach (StoreId store in product.StoresIds)
 				{
-					ids.Add(store.name, store.id);
+					ids.Add(store.storeId, store.productId);
 				}
 
 				ProductType type = product.ProductType == IAPProdutConfig.EProductType.Consumable

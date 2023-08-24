@@ -12,7 +12,7 @@ namespace Game.Services
             {
                 if (_serviceInternal == null)
                 {
-                    _serviceInternal = SharedServices.GetService<PlayFabService>();
+                    _serviceInternal = ServiceLocator.GetService<PlayFabService>();
                 }
                 return _serviceInternal;
             }

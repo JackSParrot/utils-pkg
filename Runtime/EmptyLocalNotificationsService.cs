@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 
-namespace JackSParrot.Services
+namespace JackSParrot.Services.Notifications
 {
 	[CreateAssetMenu(fileName = "EmptyLocalNotificationsService", menuName = "JackSParrot/Services/EmptyLocalNotificationsService")]
 	public class EmptyLocalNotificationsService : ALocalNotificationsService

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using JackSParrot.Services;
 using Unity.Services.Core;
 using UnityEngine;
 
-namespace JackSparrot.Services
+namespace JackSParrot.Services
 {
 	[CreateAssetMenu(fileName = "UnityServicesManagerInitializer", menuName = "JackSParrot/Services/UnityServicesManagerInitializer")]
 	public class UnityServicesManagerInitializer: AService

@@ -2,11 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JackSParrot.Services;
 using Unity.Services.Authentication;
 using UnityEngine;
 
-namespace JackSparrot.Services
+namespace JackSParrot.Services
 {
 	[CreateAssetMenu(fileName = "UnityAuthenticationService", menuName = "JackSParrot/Services/UnityAuthenticationService")]
 	public class UnityAuthenticationService: AService

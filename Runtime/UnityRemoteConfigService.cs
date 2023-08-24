@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using JackSParrot.Services;
 using Unity.Services.RemoteConfig;
 using UnityEngine;
 
-namespace JackSparrot.Services
+namespace JackSParrot.Services
 {
 	public class UnityRemoteConfigService: ARemoteConfigService
 	{

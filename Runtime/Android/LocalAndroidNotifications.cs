@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Unity.Notifications.Android;
 using UnityEngine;
 
-namespace JackSParrot.Services
+namespace JackSParrot.Services.Notifications
 {
     [CreateAssetMenu(fileName = "LocalAndroidNotifications", menuName = "JackSParrot/Services/LocalAndroidNotifications")]
     public class LocalAndroidNotifications : ALocalNotificationsService

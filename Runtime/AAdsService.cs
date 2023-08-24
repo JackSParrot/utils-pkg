@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using JackSParrot.Services;
-using UnityEngine;
 
-namespace Game.Services
+namespace JackSParrot.Services
 {
 	[Serializable]
 	public class AdUnit

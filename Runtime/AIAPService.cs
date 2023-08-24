@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace JackSParrot.Services
 {
@@ -22,8 +23,8 @@ namespace JackSParrot.Services
     [Serializable]
     public class StoreId
     {
-        public string name;
-        public string id;
+        public string storeId;
+        public string productId;
     }
 
     [Serializable]

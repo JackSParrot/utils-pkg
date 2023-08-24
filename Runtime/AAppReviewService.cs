@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace JackSParrot.Services.AppReview
+﻿namespace JackSParrot.Services.AppReview
 {
 	public abstract class AAppReviewService : AService
 	{

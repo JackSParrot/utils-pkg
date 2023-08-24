@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using JackSparrot.Services;
 using UnityEngine;
 
 namespace JackSParrot.Services
@@ -9,19 +8,19 @@ namespace JackSParrot.Services
     [CreateAssetMenu(fileName = "RemoteConfigUpdateService", menuName = "JackSParrot/Services/RemoteConfigUpdateService")]
     public class RemoteConfigUpdateService : AGameUpdateService
     {
-        public event Action<bool> OnShowUpdatePopup = force => { };
-        
         private ARemoteConfigService _remoteConfig;
 
-        public override void TryShowUpdate()
+        public override EUpdateStatus TryShowUpdate()
         {
-            string currentVersion = Application.version;
-            string remoteVersion = _remoteConfig.GetString("version", currentVersion);
-            bool forceUpdate = _remoteConfig.GetBool("forceUpgrade", false);
-            if (CompareVersion(currentVersion, remoteVersion) > 0)
-            {
-                OnShowUpdatePopup(forceUpdate);
-            }
+            string currentVersion  = Application.version;
+            string latestVersion   = _remoteConfig.GetString("latestVersion", currentVersion);
+            string minVersion      = _remoteConfig.GetString("minVersion", "0.0.0");
+            bool   updateAvailable = CompareVersion(currentVersion, latestVersion) > 0;
+            bool   forceUpdate     = CompareVersion(currentVersion, minVersion) > 0;
+
+            if (forceUpdate)
+                return EUpdateStatus.ForceUpgrade;
+            return updateAvailable ? EUpdateStatus.Upgrade : EUpdateStatus.Keep;
         }
 
         public override void Cleanup()
