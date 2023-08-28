@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace JackSParrot.Services
 {
+	[CreateAssetMenu(fileName = "UnityRemoteConfigService", menuName = "JackSParrot/Services/UnityRemoteConfigService")]
 	public class UnityRemoteConfigService: ARemoteConfigService
 	{
 		[SerializeField]

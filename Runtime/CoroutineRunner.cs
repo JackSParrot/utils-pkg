@@ -66,7 +66,8 @@ namespace JackSParrot.Services
         public override void Cleanup()
         {
             _running.Clear();
-            UnityEngine.Object.Destroy(_runner.gameObject);
+            if(_runner && _runner.gameObject)
+                UnityEngine.Object.Destroy(_runner.gameObject);
             Status = EServiceStatus.NotInitialized;
         }
 

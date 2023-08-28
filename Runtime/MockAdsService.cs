@@ -21,14 +21,14 @@ namespace Game.Services
 			yield return null;
 		}
 
-		public override bool IsAdReady(string adUnit)
+		public override bool IsAdReady()
 		{
 			return true;
 		}
 
-		public override bool ShowRewardedVideo(string adUnit, Action<VideoEndingReason> onEndCallback)
+		public override bool ShowRewardedVideo(Action<bool> onEndCallback)
 		{
-			onEndCallback(VideoEndingReason.Finished);
+			onEndCallback(true);
 			return true;
 		}
 	}

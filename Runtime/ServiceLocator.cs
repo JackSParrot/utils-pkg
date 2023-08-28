@@ -47,24 +47,25 @@ namespace JackSParrot.Services
 			}
 
 			InitializationProgress = 1f;
-			initializer.OnDestroyed += UnregisterAll;
 		}
 
 		private static IEnumerator InitializeService(AService service, ServiceLocatorInitializer initializer)
 		{
 			if (service.Status != EServiceStatus.NotInitialized)
 				yield break;
+			
 			List<Type> dependencies = service.GetDependencies();
 			if (dependencies is { Count: > 0 })
 			{
 				foreach (Type dependencyType in dependencies)
 				{
-					if (!_registeredServices.TryGetValue(dependencyType, out AService dependency))
+					AService dependency = Instance.GetServiceInternal(dependencyType);
+					if (dependency == null)
 					{
 						Debug.LogError($"Service {service.GetType().FullName} has a dependency of type {dependencyType.FullName} that is not registered");
 						continue;
 					}
-
+					
 					if (dependency.Status == EServiceStatus.NotInitialized)
 					{
 						yield return initializer.StartCoroutine(InitializeService(dependency, initializer));
@@ -141,14 +142,30 @@ namespace JackSParrot.Services
 
 		private T GetServiceInternal<T>() where T: AService
 		{
-			if (!_registeredServices.TryGetValue(typeof(T), out AService service))
+			foreach (var kvp in _registeredServices)
 			{
-				UnityEngine.Debug.LogWarning("Tried to get a non registered service from the service locator: " +
-											 typeof(T).Name);
-				return default;
+				if (typeof(T).IsAssignableFrom(kvp.Key))
+				{
+					return (T)kvp.Value;
+				}
 			}
+			UnityEngine.Debug.LogWarning("Tried to get a non registered service from the service locator: " +
+										 typeof(T).Name);
+			return default;
+		}
 
-			return (T)service;
+		private AService GetServiceInternal(Type type)
+		{
+			foreach (var kvp in _registeredServices)
+			{
+				if (type.IsAssignableFrom(kvp.Key))
+				{
+					return kvp.Value;
+				}
+			}
+			UnityEngine.Debug.LogWarning("Tried to get a non registered service from the service locator: " +
+										 type.Name);
+			return default;
 		}
 
 		private void UnregisterServiceInternal<T>()

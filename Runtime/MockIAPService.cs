@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using JackSParrot.Services;
+using UnityEngine;
 
 namespace Game.Services.IAP
 {
+    [CreateAssetMenu (fileName = "MockIAPService", menuName = "JackSParrot/Services/MockIAPService")]
     public class MockIAPService : AIAPService
     {
         public override void BuyProduct(string productId, Action<bool> callback = null)

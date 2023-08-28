@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace JackSParrot.Services
 {
+    [CreateAssetMenu(fileName = "EmptyEventTracker", menuName = "JackSParrot/Services/EmptyEventTracker")]
     class EmptyEventTracker : AEventTracker
     {
         public override void Cleanup()

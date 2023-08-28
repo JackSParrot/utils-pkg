@@ -84,7 +84,8 @@ namespace JackSParrot.Services
 
 		public override void Cleanup()
 		{
-			Object.Destroy(_listener.gameObject);
+			if(_listener && _listener.gameObject)
+				Object.Destroy(_listener.gameObject);
 		}
 
 		public override List<Type> GetDependencies()

@@ -62,9 +62,6 @@ namespace JackSParrot.Utils
             Type type = e.GetType();
             if (!_listeners.TryGetValue(type, out List<Delegate> listeners))
             {
-#if DEBUG
-                Debug.Log("Raised event with no listeners");
-#endif
                 return;
             }
 

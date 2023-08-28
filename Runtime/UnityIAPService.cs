@@ -6,6 +6,7 @@ using UnityEngine.Purchasing;
 
 namespace JackSParrot.Services
 {
+	[CreateAssetMenu(fileName = "UnityIAPService", menuName = "JackSParrot/Services/UnityIAPService")]
 	public class UnityIAPService: AIAPService, IStoreListener
 	{
 		[SerializeField]

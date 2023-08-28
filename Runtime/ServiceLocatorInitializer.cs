@@ -1,20 +1,28 @@
-﻿using System;
+﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace JackSParrot.Services
 {
 	public class ServiceLocatorInitializer: MonoBehaviour
 	{
-		internal Action OnDestroyed;
+		public UnityEvent OnInitialized;
 
-		public void OnDestroy()
-		{
-			OnDestroyed?.Invoke();
-		}
+		private bool _initialized = false;
 
-		private void Start()
+		private IEnumerator Start()
 		{
+			if (_initialized)
+			{
+				OnInitialized?.Invoke();
+				yield break;
+				
+			}
 			StartCoroutine(ServiceLocator.Initialize(this));
+			while (!ServiceLocator.Initialized)
+				yield return null;
+			_initialized = true;
+			OnInitialized?.Invoke();
 		}
 	}
 }
